@@ -1,0 +1,34 @@
+﻿<Window x:Class="Smoothing.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Smoothing" xmlns:viewmodels="clr-namespace:Smoothing.ViewModels"
+        mc:Ignorable="d"
+        Background="White"
+        Title="Сглаживание изображения" 
+       
+        Height="640" Width="640">
+    <Window.DataContext>
+        <viewmodels:ViewModel></viewmodels:ViewModel>        
+    </Window.DataContext>
+
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Image Margin="10" Source="{Binding Path=LoadedImage.FilePath}"></Image>
+        
+
+        <StackPanel Background="LightCoral" Grid.Row="1" Orientation="Vertical" FlowDirection="LeftToRight">
+            <Button Background="Silver"  Content="Загрузить" Width ="100" Margin="5" Command="{Binding AddCommand}"></Button>
+            <Button Background="Silver" Content="Сгладить" Width="100" Margin="5" Command="{Binding BlurCommand}"></Button>
+        </StackPanel>
+
+    </Grid>
+
+
+</Window>
