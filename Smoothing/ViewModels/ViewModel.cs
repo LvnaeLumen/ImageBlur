@@ -73,6 +73,27 @@ namespace Smoothing.ViewModels
                             MyImage image = new MyImage();
                             FileInfo info = new FileInfo(openFile.FileName);
                             image.FilePath = openFile.FileName;
+                            
+
+                            FileStream fs = new FileStream(openFile.FileName, FileMode.Open, FileAccess.Read);
+                            byte[] desBytes = new byte[fs.Length];
+                            fs.Read(desBytes, 0, desBytes.Length);
+                            fs.Close();
+
+                            BitmapImage bmp = null;
+                            try
+                            {
+                                bmp = new BitmapImage();
+                                bmp.BeginInit();
+                                bmp.StreamSource = new MemoryStream(desBytes);
+                                bmp.EndInit();
+                            }
+                            catch
+                            {
+                                bmp = null;
+                            }
+                            image.Wbmap = new WriteableBitmap(bmp);
+                            
 
 
                             LoadedImage = image;
@@ -111,7 +132,7 @@ namespace Smoothing.ViewModels
                             
                             
                             
-                            Bitmap bitmap = new Bitmap(memoryStream);
+                            //WritBitmap bitmap = LoadedImage;
                             memoryStream.Close();
                             GC.Collect();
 
@@ -119,32 +140,13 @@ namespace Smoothing.ViewModels
                             //но все равно иногда, раз в 20 вызовов, выдает ошибку доступа к занятому буфферному файлу
 
 
-                            GaussianBlur blur = new GaussianBlur(bitmap);
-                            bitmap.Dispose();
-                            bitmap = null;
+                            GaussianBlur blur = new GaussianBlur(LoadedImage.Wbmap as WriteableBitmap);
+                            //bitmap.Dispose();
+                            //bitmap = null;
 
-                            Bitmap result = blur.Process(10);
+                            WriteableBitmap result = blur.Process(10);
 
-                                
-
-                            using (MemoryStream memory = new MemoryStream())
-                            {
-                                using (FileStream fs = new FileStream(bitmap_path, FileMode.Create, FileAccess.ReadWrite))
-                                {
-                                    result.Save(memory, ImageFormat.Jpeg);
-                                    byte[] bytes = memory.ToArray();
-                                    fs.Write(bytes, 0, bytes.Length);
-                                }
-                            }
-
-                                                                                  
-
-                            
-
-                            /*           result.Save(bitmap_path, ImageFormat.Jpeg);
-                                       result.Dispose();*/
-
-                            LoadedImage.FilePath = bitmap_path;
+                            LoadedImage.Wbmap = result;
                             OnPropertyChanged(nameof(LoadedImage));
 
                             

@@ -20,7 +20,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <Image Margin="10" Source="{Binding Path=LoadedImage.FilePath}"></Image>
+        <Image Margin="10" Source="{Binding LoadedImage.Wbmap}"></Image>
         
 
         <StackPanel Background="LightCoral" Grid.Row="1" Orientation="Vertical" FlowDirection="LeftToRight">

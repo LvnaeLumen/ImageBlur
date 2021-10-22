@@ -5,10 +5,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Drawing;
+using System.Windows;
 
 namespace Smoothing.Models
 {
@@ -27,21 +29,30 @@ namespace Smoothing.Models
         private readonly int[] _green;
         private readonly int[] _blue;
 
-        private readonly int _width;
-        private readonly int _height;
+        private int _width;
+        private int _height;
+        private WriteableBitmap bits;
 
         private readonly ParallelOptions _pOptions = new ParallelOptions { MaxDegreeOfParallelism = 16 };
 
-        public GaussianBlur(Bitmap image) //Честно украдено
+        public GaussianBlur(WriteableBitmap image) //Честно украдено
         {
-            var rct = new Rectangle(0, 0, image.Width, image.Height);
-            var source = new int[rct.Width * rct.Height];
-            var bits = image.LockBits(rct, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            Marshal.Copy(bits.Scan0, source, 0, source.Length);
-            image.UnlockBits(bits);
 
-            _width = image.Width;
-            _height = image.Height;
+            var rct = new Rectangle(0, 0, image.PixelWidth, image.PixelHeight);
+            var source = new int[rct.Width * rct.Height];
+
+            _width = image.PixelWidth;
+            _height = image.PixelHeight;
+
+
+            int bytesPerPixel = (image.Format.BitsPerPixel + 7) / 8; // general formula
+            int stride = bytesPerPixel * _width; // general formula valid for all PixelFormats
+
+
+            image.CopyPixels(source, stride, 0);
+            bits = image.Clone();
+
+            
 
             _alpha = new int[_width * _height];
             _red = new int[_width * _height];
@@ -57,7 +68,7 @@ namespace Smoothing.Models
             });
         }
 
-        public Bitmap Process(int radial)
+        public WriteableBitmap Process(int radial)
         {
             var newAlpha = new int[_width * _height];
             var newRed = new int[_width * _height];
@@ -86,11 +97,19 @@ namespace Smoothing.Models
                 dest[i] = (int)((uint)(newAlpha[i] << 24) | (uint)(newRed[i] << 16) | (uint)(newGreen[i] << 8) | (uint)newBlue[i]);
             });
 
-            var image = new Bitmap(_width, _height);
-            var rct = new Rectangle(0, 0, image.Width, image.Height);
-            var bits2 = image.LockBits(rct, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            Marshal.Copy(dest, 0, bits2.Scan0, dest.Length);
-            image.UnlockBits(bits2);
+            var image = new WriteableBitmap(_width, _height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null );
+            var rct = new Rectangle(0, 0, image.PixelWidth, image.PixelHeight);
+
+            int bytesPerPixel = (image.Format.BitsPerPixel + 7) / 8; // general formula
+            int stride = bytesPerPixel * _width; // general formula valid for all PixelFormats
+
+            image.WritePixels(new Int32Rect(0, 0, _width, _height), dest,stride,0);
+
+            //var bits2 = image.LockBits(rct, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            //Marshal.Copy(dest, 0, bits2.Scan0, dest.Length);
+            //image.UnlockBits(bits2);
+            
+            //bits.WritePixels();
             return image;
         }
 

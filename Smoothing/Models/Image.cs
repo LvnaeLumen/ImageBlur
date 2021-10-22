@@ -6,7 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Smoothing.Models
 {
@@ -20,6 +21,8 @@ namespace Smoothing.Models
         }
 
         private string filePath;
+
+        private WriteableBitmap wbmap = new  WriteableBitmap(100, 100, 300, 300, PixelFormats.Bgra32, null);
 
 
         public string FilePath
@@ -35,39 +38,18 @@ namespace Smoothing.Models
             }
         }
 
-        internal object FromFile(object fileName)
+        public WriteableBitmap Wbmap
         {
-            throw new NotImplementedException();
-        }
-
-
-        /*        private string fileName;
-
-                public string FileName
-                {
-                    get { return fileName; }
-                    set
-                    {
-                        if (fileName != value)
-                        {
-                            fileName = value;
-                            OnPropertyChanged(nameof(FileName));
-                        }
-                   */
-    }
-}
-
-  /*      private Bitmap image;
-        public Bitmap Image
-        {
-            get { return image; }
+            get { return wbmap; }
             set
             {
-                if (image != value)
+                if (wbmap != value)
                 {
-                    image = value;
-                    OnPropertyChanged(nameof(FileName));
+                    wbmap = value;
+                    OnPropertyChanged(nameof(Wbmap));
                 }
             }
         }
-*/
+
+    }
+}
