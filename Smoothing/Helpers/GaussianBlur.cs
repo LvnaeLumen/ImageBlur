@@ -12,17 +12,11 @@ using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Windows;
 
-namespace Smoothing.Models
+namespace Smoothing.Helpers
 {
-    public class GaussianBlur : INotifyPropertyChanged
+    public class GaussianBlur 
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
-
+        
 
         private readonly int[] _alpha;
         private readonly int[] _red;
@@ -67,14 +61,14 @@ namespace Smoothing.Models
                 _blue[i] = (source[i] & 0x0000ff);
             });
         }
-
-        public WriteableBitmap Process(int radial)
+        private void BlurRoutine(int radial, out int[] dest)
         {
             var newAlpha = new int[_width * _height];
             var newRed = new int[_width * _height];
             var newGreen = new int[_width * _height];
             var newBlue = new int[_width * _height];
-            var dest = new int[_width * _height];
+            
+            var buff = new int[_width * _height];
 
             Parallel.Invoke(
                 () => gaussBlur_4(_alpha, newAlpha, radial),
@@ -82,7 +76,7 @@ namespace Smoothing.Models
                 () => gaussBlur_4(_green, newGreen, radial),
                 () => gaussBlur_4(_blue, newBlue, radial));
 
-            Parallel.For(0, dest.Length, _pOptions, i =>
+            Parallel.For(0, buff.Length, _pOptions, i =>
             {
                 if (newAlpha[i] > 255) newAlpha[i] = 255;
                 if (newRed[i] > 255) newRed[i] = 255;
@@ -94,8 +88,18 @@ namespace Smoothing.Models
                 if (newGreen[i] < 0) newGreen[i] = 0;
                 if (newBlue[i] < 0) newBlue[i] = 0;
 
-                dest[i] = (int)((uint)(newAlpha[i] << 24) | (uint)(newRed[i] << 16) | (uint)(newGreen[i] << 8) | (uint)newBlue[i]);
+                buff[i] = (int)((uint)(newAlpha[i] << 24) | (uint)(newRed[i] << 16) | (uint)(newGreen[i] << 8) | (uint)newBlue[i]);
             });
+            dest = buff;
+        }
+        public WriteableBitmap BlurImage(int radial)
+        {
+            return Process(radial);
+        }
+        private WriteableBitmap Process(int radial)
+        {
+            var dest = new int[_width * _height];
+            BlurRoutine(radial, out dest);
 
             var image = new WriteableBitmap(_width, _height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null );
             var rct = new Rectangle(0, 0, image.PixelWidth, image.PixelHeight);

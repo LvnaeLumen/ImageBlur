@@ -10,23 +10,28 @@
        
         Height="640" Width="640">
     <Window.DataContext>
-        <viewmodels:ViewModel></viewmodels:ViewModel>        
+        <viewmodels:BlurViewModel></viewmodels:BlurViewModel>
     </Window.DataContext>
-
+ 
     <Grid>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <Image Margin="10" Source="{Binding LoadedImage.Wbmap}"></Image>
+
+
+        <StackPanel Background="LightCoral" Grid.Row="0" Orientation="Horizontal" FlowDirection="LeftToRight">
+            <Button Background="White" Content="Загрузить" Width ="100" Margin="5" Command="{Binding AddCommand}"></Button>
+            <Button Background="White" Content="Сгладить" Width="100" Margin="5" 
+                    Command="{Binding BlurCommand}" IsEnabled="{Binding IsImageAvailable }"></Button>
+            <TextBox Background="White" Width ="40" Margin="5" Text="{Binding BlurLevel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"> </TextBox>
+            
+        </StackPanel>
+
+        <Image Grid.Row="1" Margin="10" Source="{Binding CurrentImage}"></Image>
         
 
-        <StackPanel Background="LightCoral" Grid.Row="1" Orientation="Vertical" FlowDirection="LeftToRight">
-            <Button Background="Silver"  Content="Загрузить" Width ="100" Margin="5" Command="{Binding AddCommand}"></Button>
-            <Button Background="Silver" Content="Сгладить" Width="100" Margin="5" Command="{Binding BlurCommand}"></Button>
-        </StackPanel>
 
     </Grid>
 

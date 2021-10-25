@@ -24,6 +24,8 @@ namespace Smoothing
         public MainWindow()
         {
             InitializeComponent();
+
+            
             
         }
     }
