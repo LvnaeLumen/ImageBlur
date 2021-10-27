@@ -50,8 +50,8 @@ namespace Smoothing.ViewModels
         public BlurViewModel()
         {
             ///            private ImageDataConverter imageDataConverter = WBImage.ConvertFromWBToBytesArray;
-            AddCommand = new RelayCommand(LoadImage, () => { return true; });
-            BlurCommand = new RelayCommand(GaussBlurImage, () => { return true; }); // По хорошему return IsImageAvailable, но не работает
+            AddCommand = new RelayCommand(LoadImage, ()=> { return true; } ); //() => { return true; }
+            BlurCommand = new RelayCommand(GaussBlurImage, () => { return IsImageAvailable; } ); // По хорошему return IsImageAvailable, но не работает
         } 
 
         /*Реализации свойств*/
@@ -71,7 +71,6 @@ namespace Smoothing.ViewModels
                 OnPropertyChanged(nameof(_IsImageAvailable));
             }
         }
-
 
         public WriteableBitmap LoadedImage //Последнее загруженное изображение
         {
@@ -97,6 +96,7 @@ namespace Smoothing.ViewModels
                 {
                     _currentImage = value;
                     OnPropertyChanged(nameof(_currentImage));
+                    //BlurCommand.InvalidateCanExecute();
                 }
             }
         }
@@ -221,6 +221,14 @@ namespace Smoothing.ViewModels
 
                 IsImageAvailable = true;
                 OnPropertyChanged(nameof(IsImageAvailable));
+            }
+        }
+
+        private void PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if ((e.Text) == null || !(e.Text).All(char.IsDigit))
+            {
+                e.Handled = true;
             }
         }
     }

@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Smoothing.Helpers
-{ 
+{
     public class RelayCommand : ICommand
     {
-        Action execute;
-        Func<bool> canExecute;
+        private Action execute;
+        private Func<bool> canExecute;
+
 
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
@@ -18,21 +19,23 @@ namespace Smoothing.Helpers
             this.canExecute = canExecute;
         }
 
-        public event EventHandler CanExecuteChanged;
+
         public bool CanExecute(object parameter)
         {
-            return this.canExecute();
+            return canExecute == null ? true : canExecute();
+        }
+
+        public event EventHandler CanExecuteChanged
+        {   
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
         }
 
         public void Execute(object parameter)
         {
-            if (canExecute())
-                this.execute();
+            execute();
         }
 
-        public void InvalidateCanExecute()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        
     }
 }
