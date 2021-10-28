@@ -15,68 +15,6 @@ namespace Smoothing.Helpers
     
     public class WBImage
     {
- /*       public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
-
-
-        private byte[] imageData;
-        private WriteableBitmap wbImage;
-
-        
-        public void Clone(WBImage source)
-        {
-            this.imageData = new byte[source.imageData.Length];
-            source.imageData.CopyTo(this.imageData, 0);
-
-            this.wbImage = new WriteableBitmap(source.WbImage.Clone());                                 
-        }
-
-        public WBImage(WBImage source)
-        {
-            Clone(source);
-        }
-
-        public WBImage(byte[] bytes, WriteableBitmap wb)
-        {
-            this.imageData = new byte[bytes.Length];
-            bytes.CopyTo(this.imageData, 0);
-
-            this.wbImage = new WriteableBitmap(wb.Clone());
-        }
-
-        
-
-        public byte[] ImageData
-        {
-            get { return imageData; }
-            set
-            {
-                if (imageData != value)
-                {
-                    imageData = value;
-                    OnPropertyChanged(nameof(imageData));
-                }
-            }
-        }
-
-        public WriteableBitmap WbImage
-        {
-            get { return wbImage; }
-            set
-            {
-                if (wbImage != value)
-                {
-                    wbImage = value;
-                    OnPropertyChanged(nameof(imageData));
-                }
-            }
-            //get { return ConvertFromBytesArrayToWB(this.imageData); }
-        }
-*/
         public static WriteableBitmap ConvertFromBytesArrayToWB(byte[] imageData)
         {
 
@@ -92,14 +30,16 @@ namespace Smoothing.Helpers
 
         public static byte[] ConvertFromWBToBytesArray(WriteableBitmap wbitmapSource)
         {
-            var width = wbitmapSource.PixelWidth;
-            var height = wbitmapSource.PixelHeight;
-            var stride = width * ((wbitmapSource.Format.BitsPerPixel + 7) / 8);
-
-            var bitmapData = new byte[height * stride];
-
-            wbitmapSource.CopyPixels(bitmapData, stride, 0);
-            return bitmapData;
+            //var bytes = value as byte[];
+            
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create((BitmapSource)wbitmapSource));
+                enc.Save(outStream);
+                var ret = outStream.ToArray();
+                return ret;
+            }
         }
 
     }

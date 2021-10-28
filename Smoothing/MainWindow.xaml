@@ -9,34 +9,9 @@
         Title="Сглаживание изображения" 
        
         Height="640" Width="640">
-    <Window.DataContext>
-        <viewmodels:BlurViewModel></viewmodels:BlurViewModel>
-    </Window.DataContext>
- 
+
     <Grid>
         
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-
-        <StackPanel Background="LightCoral" Grid.Row="0" Orientation="Horizontal" FlowDirection="LeftToRight">
-            <Button Background="White" Content="Загрузить" Width ="100" Margin="5" Command="{Binding AddCommand}"></Button>
-            <Button Background="White" Content="Сгладить" Width="100" Margin="5" 
-                    Command="{Binding BlurCommand}" 
-                    
-                    
-                    ></Button>
-            <TextBox Background="White" Width ="40" Margin="5"      
-                     Text="{Binding BlurLevel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"> </TextBox>
-            
-        </StackPanel>
-
-        <Image Grid.Row="1" Margin="10" Source="{Binding CurrentImage}"></Image>
-        
-
-
     </Grid>
 
 

@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Smoothing.BlurUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Smoothing"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    
+    <Grid x:Name="blur_LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <StackPanel Background="LightCoral" Grid.Row="0" Orientation="Horizontal" FlowDirection="LeftToRight">
+            <Button Background="White" Content="Загрузить" Width ="100" Margin="5" Command="{Binding AddCommand}"></Button>
+            <Button Background="White" Content="Сгладить" Width="100" Margin="5" 
+                    Command="{Binding BlurCommand}" 
+                    ></Button>
+            <TextBox Background="White" Width ="40" Margin="5"      
+                     Text="{Binding BlurLevel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+
+        </StackPanel>
+
+        <Image Grid.Row="1" Margin="10" Source="{Binding CurrentImage}"></Image>
+    </Grid>
+    
+    
+</UserControl>

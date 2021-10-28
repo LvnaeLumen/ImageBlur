@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Smoothing.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,28 +13,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Smoothing.ViewModels;
-using Smoothing.Helpers;
 
 namespace Smoothing
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for BlurUserControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class BlurUserControl : UserControl
     {
-        public MainWindow()
+        public BlurUserControl(BlurViewModel viewModel)
         {
             InitializeComponent();
 
-            Test.TestAccesebilty();
-
-            var viewModel = new BlurViewModel(new JpgDialogImageLoader(), 
-                new GaussianBlur(), new CustomMessageBox(this));
-            var view = new BlurUserControl(viewModel);
-            Content = view;
-            
-            
-        }
+            Loaded += delegate { blur_LayoutRoot.DataContext = viewModel; };
+            Unloaded += delegate { blur_LayoutRoot.DataContext = null; }
+;        }
     }
 }

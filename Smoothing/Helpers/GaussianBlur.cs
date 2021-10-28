@@ -11,42 +11,38 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Windows;
+using Smoothing.Interfaces;
 
 namespace Smoothing.Helpers
 {
-    public class GaussianBlur 
+    public class GaussianBlur : IGaussianBlur
     {
         
-
-        private readonly int[] _alpha;
-        private readonly int[] _red;
-        private readonly int[] _green;
-        private readonly int[] _blue;
+        private int[] _alpha;
+        private int[] _red;
+        private int[] _green;
+        private int[] _blue;
 
         private int _width;
         private int _height;
-        private WriteableBitmap bits;
 
         private readonly ParallelOptions _pOptions = new ParallelOptions { MaxDegreeOfParallelism = 16 };
 
-        public GaussianBlur(WriteableBitmap image) //Честно украдено
+        private void BlurRoutine(WriteableBitmap image, int radial, out int[] dest)
         {
-
-            var rct = new Rectangle(0, 0, image.PixelWidth, image.PixelHeight);
+            var baseImage = image.Clone();
+            var rct = new Rectangle(0, 0, baseImage.PixelWidth, baseImage.PixelHeight);
             var source = new int[rct.Width * rct.Height];
 
-            _width = image.PixelWidth;
-            _height = image.PixelHeight;
+            _width = baseImage.PixelWidth;
+            _height = baseImage.PixelHeight;
 
 
-            int bytesPerPixel = (image.Format.BitsPerPixel + 7) / 8; // general formula
+            int bytesPerPixel = (baseImage.Format.BitsPerPixel + 7) / 8; // general formula
             int stride = bytesPerPixel * _width; // general formula valid for all PixelFormats
 
 
-            image.CopyPixels(source, stride, 0);
-            bits = image.Clone();
-
-            
+            baseImage.CopyPixels(source, stride, 0);
 
             _alpha = new int[_width * _height];
             _red = new int[_width * _height];
@@ -60,9 +56,7 @@ namespace Smoothing.Helpers
                 _green[i] = (source[i] & 0x00ff00) >> 8;
                 _blue[i] = (source[i] & 0x0000ff);
             });
-        }
-        private void BlurRoutine(int radial, out int[] dest)
-        {
+
             var newAlpha = new int[_width * _height];
             var newRed = new int[_width * _height];
             var newGreen = new int[_width * _height];
@@ -92,29 +86,25 @@ namespace Smoothing.Helpers
             });
             dest = buff;
         }
-        public WriteableBitmap BlurImage(int radial)
-        {
-            return Process(radial);
-        }
-        private WriteableBitmap Process(int radial)
+        public byte[] BlurImage(byte[] sourceImage, int radial)
         {
             var dest = new int[_width * _height];
-            BlurRoutine(radial, out dest);
+            BlurRoutine(WBImage.ConvertFromBytesArrayToWB(sourceImage), radial, out dest);
 
-            var image = new WriteableBitmap(_width, _height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null );
+            var image = new WriteableBitmap(_width, _height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null);
             var rct = new Rectangle(0, 0, image.PixelWidth, image.PixelHeight);
 
             int bytesPerPixel = (image.Format.BitsPerPixel + 7) / 8; // general formula
             int stride = bytesPerPixel * _width; // general formula valid for all PixelFormats
 
-            image.WritePixels(new Int32Rect(0, 0, _width, _height), dest,stride,0);
+            image.WritePixels(new Int32Rect(0, 0, _width, _height), dest, stride, 0);
 
             //var bits2 = image.LockBits(rct, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
             //Marshal.Copy(dest, 0, bits2.Scan0, dest.Length);
             //image.UnlockBits(bits2);
-            
+
             //bits.WritePixels();
-            return image;
+            return WBImage.ConvertFromWBToBytesArray(image);
         }
 
         private void gaussBlur_4(int[] source, int[] dest, int r)
