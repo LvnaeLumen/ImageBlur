@@ -5,15 +5,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smoothing.Helpers
 {
     class JpgDialogImageLoader:IImageLoader
-    {   
-        public bool CanLoad()
+    {
+        private bool loaded = false;
+        public JpgDialogImageLoader()
         {
-            return true;
+            Task.Factory.StartNew(() => { System.Threading.Thread.Sleep(500); })
+            .ContinueWith(task =>
+            {
+
+                loaded = true;
+
+            }, System.Threading.CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+        public bool CanLoad()
+        {            
+            return loaded;
         }
         public byte[] LoadImage()
         {

@@ -41,11 +41,11 @@ namespace Smoothing.ViewModels
         private readonly IGaussianBlur _gaussianBlur;
         private readonly IMessageBox _messageBox;
 
-        private bool _IsImageAvailable = false; 
+        private bool _isImageAvailable = false; 
         private int _blur_level;            //Уровень сглаживания
 
-        public RelayCommand AddCommand { get; }
-        public RelayCommand BlurCommand { get; }
+        public ICommand AddCommand { get; }
+        public ICommand BlurCommand { get; }
 
         public BlurViewModel(IImageLoader imageLoader, IGaussianBlur gaussianBlur, IMessageBox messageBox)
         {
@@ -57,12 +57,14 @@ namespace Smoothing.ViewModels
             AddCommand = new RelayCommand(LoadImage, ()=> { return imageLoader.CanLoad(); } );
             //Возможно не лучшее решение, но логика следующая: Если, например, будет использован класс,
             //выполняющй загрузку изображения после подключения к веб-серверу, и ожидающий ответа и реализующий CanLoad
-            BlurCommand = new RelayCommand(GaussBlurImage, () => { return IsImageAvailable; } );
+            BlurCommand = new RelayCommand(GaussBlurImage, () => { return _isImageAvailable; } );
+ 
+        }
 
-        } 
+
 
         /*Реализации свойств*/
-        public bool IsImageAvailable
+        /*private bool IsImageAvailable
         //Возможно, лучше поставить флаг, например в случае, когда нужно заблокировать обработку
         // изображения, но ImageData не занулена
         {
@@ -77,7 +79,7 @@ namespace Smoothing.ViewModels
                 _IsImageAvailable = value;
                 OnPropertyChanged(nameof(_IsImageAvailable));
             }
-        }
+        }*/
 
         public byte[] LoadedImage //Последнее загруженное изображение
         {
@@ -89,6 +91,7 @@ namespace Smoothing.ViewModels
                     _loadedImage = value;                    
 
                     OnPropertyChanged(nameof(_loadedImage));
+
                 }
             }
         }
@@ -118,7 +121,7 @@ namespace Smoothing.ViewModels
                     if (value < 0)
                     {
 
-                        _messageBox.Show("Уровень сглаживания должен быть положительным");
+                        _messageBox.Show("Blur depth must be a positive number");
                     }
                     else
                     {
@@ -189,8 +192,8 @@ namespace Smoothing.ViewModels
                 OnPropertyChanged(nameof(LoadedImage));
                 OnPropertyChanged(nameof(CurrentImage));
 
-                IsImageAvailable = true;
-                OnPropertyChanged(nameof(IsImageAvailable));
+                _isImageAvailable = true;
+                //OnPropertyChanged(nameof(IsImageAvailable));
             }
         }
 

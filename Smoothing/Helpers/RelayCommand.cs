@@ -9,33 +9,36 @@ namespace Smoothing.Helpers
 {
     public class RelayCommand : ICommand
     {
+
         private Action execute;
         private Func<bool> canExecute;
-
 
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
             this.execute = execute;
             this.canExecute = canExecute;
+
+            
+            CommandManager.RequerySuggested += (sender, e) => RaiseCanExecuteChanged(); ;
         }
 
-
+        public event EventHandler CanExecuteChanged;
         public bool CanExecute(object parameter)
         {
-            return canExecute == null ? true : canExecute();
-        }
-
-        public event EventHandler CanExecuteChanged
-        {   
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            return this.canExecute();
         }
 
         public void Execute(object parameter)
         {
-            execute();
+            if (canExecute())
+                this.execute();
         }
 
-        
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+
     }
 }

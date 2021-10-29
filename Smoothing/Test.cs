@@ -53,9 +53,7 @@ namespace Smoothing
                 throw new Exception("Blur image command CanExecute is not false");
             }
             
-            viewModel.IsImageAvailable = true;
-            
-            if (viewModel.BlurCommand.CanExecute(null) == false)
+            if (viewModel.BlurCommand.CanExecute(null) != false)
             {
                 throw new Exception("Blur image command CanExecute is not false");
             }

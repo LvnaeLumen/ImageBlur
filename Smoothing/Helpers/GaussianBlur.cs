@@ -99,11 +99,6 @@ namespace Smoothing.Helpers
 
             image.WritePixels(new Int32Rect(0, 0, _width, _height), dest, stride, 0);
 
-            //var bits2 = image.LockBits(rct, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            //Marshal.Copy(dest, 0, bits2.Scan0, dest.Length);
-            //image.UnlockBits(bits2);
-
-            //bits.WritePixels();
             return WBImage.ConvertFromWBToBytesArray(image);
         }
 
